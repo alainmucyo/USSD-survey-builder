@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,12 +13,57 @@ import (
 type data struct {
 	ProjectName string
 	SurveyName  string
+	Questions   string
+}
+type Question struct {
+	Id      int      `json:"id"`
+	Title   string   `json:"title"`
+	Answers []Answer `json:"answers"`
+}
+type Answer struct {
+	Id    int    `json:"id"`
+	Title string `json:"title"`
 }
 
 func main() {
+	q := []Question{
+		Question{
+			Id:    1,
+			Title: "Question 1",
+			Answers: []Answer{
+				Answer{
+					Id:    1,
+					Title: "Answer 1.1",
+				},
+				Answer{
+					Id:    2,
+					Title: "Answer 1.2",
+				},
+			},
+		},
+		Question{
+			Id:    2,
+			Title: "Question 2",
+			Answers: []Answer{
+				Answer{
+					Id:    3,
+					Title: "Answer 2.1",
+				},
+				Answer{
+					Id:    4,
+					Title: "Answer 2.2",
+				},
+			},
+		},
+	}
+	// questions to string
+	jsonData, _ := json.Marshal(q)
+	// jsondata to string
+	jsonString := string(jsonData)
 	d := data{
 		ProjectName: "food-survey",
 		SurveyName:  "Food survey",
+		Questions:   jsonString,
 	}
 	t := template.Must(template.ParseGlob("template/main.go"))
 
@@ -25,6 +71,10 @@ func main() {
 	f, _ := os.Create(d.ProjectName + "/main.go")
 	defer f.Close()
 	t.ExecuteTemplate(f, "main.go", d)
+	type Answer struct {
+		Id    int    `json:"id"`
+		Title string `json:"title"`
+	}
 
 	copyFiles("template/core", d.ProjectName+"/core")
 	copyFiles("template/handlers", d.ProjectName+"/handlers")

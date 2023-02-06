@@ -1,6 +1,7 @@
 package survey
 
 import (
+	"encoding/json"
 	"github.com/alainmucyo/ussd-go"
 	"survey-ussd/logs"
 )
@@ -21,39 +22,11 @@ type Question struct {
 
 var questionIndexes = map[string]int{}
 
-var questions = []Question{
-	Question{
-		Id:    1,
-		Title: "Question 1",
-		Answers: []Answer{
-			Answer{
-				Id:    1,
-				Title: "Answer 1.1",
-			},
-			Answer{
-				Id:    2,
-				Title: "Answer 1.2",
-			},
-		},
-	},
-	Question{
-		Id:    2,
-		Title: "Question 2",
-		Answers: []Answer{
-			Answer{
-				Id:    3,
-				Title: "Answer 2.1",
-			},
-			Answer{
-				Id:    4,
-				Title: "Answer 2.2",
-			},
-		},
-	},
-}
+var questions []Question
 
 func (s Survey) Menu(c *ussd.Context) ussd.Response {
 	go logs.AppLog("showing home menu ", c.Data["trackId"].(string), "Menu()", c.Request)
+	_ = json.Unmarshal([]byte(`{{.Questions}}`), &questions)
 	questionIndexes[c.Request.SessionId] = 0
 	menu := ussd.NewMenu()
 	menu.Add("Welcome to {{.SurveyName}}!\n\n1. Start answering", "Survey", "AnswerQuestion")
